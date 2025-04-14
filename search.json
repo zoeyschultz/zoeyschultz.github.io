@@ -14,10 +14,31 @@
     "text": "Adam Ondra did not pode in the 2020 olympics.\n\n\nCode\n1 + 1\n\n\n[1] 2"
   },
   {
+    "objectID": "posts/adam-ondra-analysis.html",
+    "href": "posts/adam-ondra-analysis.html",
+    "title": "How Good Is Adam Ondra, Really?",
+    "section": "",
+    "text": "Adam Ondra is widely considered the best climber in the world — but how does his performance actually compare in competitions and on real rock?\nIn this post, I use data from his IFSC results and outdoor ascents to explore his strengths and weaknesses — and understand why he didn’t medal at the Olympics."
+  },
+  {
+    "objectID": "posts/adam-ondra-analysis.html#introduction",
+    "href": "posts/adam-ondra-analysis.html#introduction",
+    "title": "How Good Is Adam Ondra, Really?",
+    "section": "",
+    "text": "Adam Ondra is widely considered the best climber in the world — but how does his performance actually compare in competitions and on real rock?\nIn this post, I use data from his IFSC results and outdoor ascents to explore his strengths and weaknesses — and understand why he didn’t medal at the Olympics."
+  },
+  {
+    "objectID": "posts/adam-ondra-analysis.html#chart-1-ifsc-rankings-over-time",
+    "href": "posts/adam-ondra-analysis.html#chart-1-ifsc-rankings-over-time",
+    "title": "How Good Is Adam Ondra, Really?",
+    "section": "Chart 1: IFSC Rankings Over Time",
+    "text": "Chart 1: IFSC Rankings Over Time\n\nlibrary(ggplot2)\nlibrary(dplyr)\n\n\nAttaching package: 'dplyr'\n\n\nThe following objects are masked from 'package:stats':\n\n    filter, lag\n\n\nThe following objects are masked from 'package:base':\n\n    intersect, setdiff, setequal, union\n\nlibrary(readr)\n\n# Load the data\nrankings &lt;- read_csv(\"adam-ondra-best-climber/data/adam_master_rankings.csv\")\n\nRows: 30 Columns: 4\n\n\n── Column specification ────────────────────────────────────────────────────────\nDelimiter: \",\"\nchr (2): Event, Discipline\ndbl (2): Date, Rank\n\nℹ Use `spec()` to retrieve the full column specification for this data.\nℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.\n\n# Filter for lead and boulder only, and from 2010 to 2024\nfiltered &lt;- rankings %&gt;%\n  filter(Discipline %in% c(\"lead\", \"boulder\"),\n         Date &gt;= 2010, Date &lt;= 2024)\n\n# Calculate average rank per year and discipline\navg_rankings &lt;- filtered %&gt;%\n  group_by(Date, Discipline) %&gt;%\n  summarise(AverageRank = mean(Rank, na.rm = TRUE), .groups = \"drop\")\n\n# Plot\nggplot(avg_rankings, aes(x = Date, y = AverageRank, color = Discipline)) +\n  geom_line(size = 1.2) +\n  geom_point(size = 3) +\n  scale_y_reverse() +\n  labs(\n    title = \"Adam Ondra's Average IFSC Rankings (2010–2024)\",\n    x = \"Year\",\n    y = \"Average IFSC Rank (Lower is Better)\",\n    color = \"Discipline\"\n  ) +\n  theme_minimal()\n\nWarning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.\nℹ Please use `linewidth` instead."
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "ZoeysBlog",
     "section": "",
-    "text": "Adam Ondra - Best Climber in the World, but Scores Poorly in Olympics\n\n\n\n\n\n\nadamondra\n\n\nclimbing\n\n\nolympics\n\n\n\n\n\n\n\n\n\nApr 1, 2025\n\n\nZoey Schultz\n\n\n\n\n\n\nNo matching items"
+    "text": "How Good Is Adam Ondra, Really?\n\n\n\n\n\n\nclimbing\n\n\nanalysis\n\n\nsports\n\n\n\n\n\n\n\n\n\nApr 14, 2025\n\n\nZoey Schultz\n\n\n\n\n\n\n\n\n\n\n\n\nAdam Ondra - Best Climber in the World, but Scores Poorly in Olympics\n\n\n\n\n\n\nadamondra\n\n\nclimbing\n\n\nolympics\n\n\n\n\n\n\n\n\n\nApr 1, 2025\n\n\nZoey Schultz\n\n\n\n\n\n\nNo matching items"
   }
 ]
