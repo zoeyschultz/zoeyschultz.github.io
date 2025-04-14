@@ -1,0 +1,145 @@
+---
+title: "How Good Is Adam Ondra, Really?"
+author: "Zoey Schultz"
+date: today
+format: html
+categories: [climbing, analysis, sports]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE
+)
+
+# Load libraries here to avoid repeating and triggering messages in other chunks
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(lubridate)
+library(tibble)
+```
+
+## Introduction
+
+Adam Ondra is widely considered the best climber in the world — but how does his performance actually compare in competitions and on real rock?
+
+In this post, I use data from his IFSC results and outdoor ascents to explore his strengths, tradeoffs, and one surprising weakness that cost him at the Olympics.
+
+------------------------------------------------------------------------
+
+```{r chart1, include=FALSE, message=FALSE, warning=FALSE}
+
+rankings <- read_csv("adam-ondra-best-climber/data/adam_master_rankings.csv", show_col_types = FALSE)
+
+filtered <- rankings |>
+  filter(Discipline %in% c("lead", "boulder"),
+         Date >= 2010, Date <= 2024)
+
+avg_rankings <- filtered |>
+  group_by(Date, Discipline) |>
+  summarise(AverageRank = mean(Rank, na.rm = TRUE), .groups = "drop")
+
+chart1 <- ggplot(avg_rankings, aes(x = Date, y = AverageRank, color = Discipline)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(linewidth = 3) +
+  scale_y_reverse() +
+  labs(
+    title = "Adam Ondra's Average IFSC Rankings (2010–2024)",
+    x = "Year",
+    y = "Average IFSC Rank (Lower is Better)",
+    color = "Discipline"
+  ) +
+  theme_minimal()
+
+ggsave("images/chart1.png", chart1, width = 8, height = 5)
+```
+
+## Chart 1: IFSC Rankings Over Time
+
+![Adam Ondra IFSC Rankings](images/chart1.png)
+
+Ondra’s peak performance in IFSC competitions came between 2013 and 2017...
+
+Ondra’s peak performance in IFSC competitions came between 2013 and 2017, particularly in lead climbing where he was frequently ranked among the top 5. His rankings dip slightly around 2021, the Olympic year, before showing more variability in recent seasons.
+
+------------------------------------------------------------------------
+
+```{r chart2, include=FALSE}
+
+ascents <- read_csv("adam-ondra-best-climber/data/adam_all_ascents.csv", show_col_types = FALSE)
+
+ascents <- ascents |>
+  filter(Grade %in% c("9a", "9a+", "9b", "9b+", "9c")) |>
+  mutate(Date = dmy(Date), Year = year(Date))
+
+sends_per_year <- ascents |>
+  group_by(Year) |>
+  summarise(HardSends = n(), .groups = "drop")
+
+avg_ifsc_rank <- filtered |>
+  group_by(Date) |>
+  summarise(AvgRank = mean(Rank, na.rm = TRUE), .groups = "drop") |>
+  rename(Year = Date)
+
+combined <- inner_join(sends_per_year, avg_ifsc_rank, by = "Year")
+
+chart2 <- ggplot(combined, aes(x = HardSends, y = AvgRank)) +
+  geom_point(size = 4, color = "#377eb8") +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed", color = "gray40") +
+  scale_y_reverse() +
+  labs(
+    title = "Outdoor Focus vs. IFSC Performance",
+    x = "Number of 9a+ Outdoor Sends",
+    y = "Average IFSC Ranking (Lower is Better)"
+  ) +
+  theme_minimal()
+
+ggsave("images/chart2.png", chart2, width = 8, height = 5)
+```
+
+## Chart 2: Outdoor Focus vs. IFSC Performance
+
+![Outdoor vs IFSC](images/chart2.png)
+
+This chart shows a clear tradeoff: in years when Ondra focused more on hard outdoor ascents...
+
+
+------------------------------------------------------------------------
+
+```{r chart3, include=FALSE}
+
+climbers <- tibble::tibble(
+  Climber = c("Adam Ondra", "Jakob Schubert", "Stefano Ghisolfi", "Tomoa Narasaki", "Sean Bailey"),
+  HardestGrade = c("9c", "9b+", "9b+", "9a+", "9b"),
+  Avg_IFSC_Rank = c(5.2, 6.1, 8.3, 7.5, 9.2),
+  Medals = c(38, 31, 19, 17, 10)
+)
+
+grade_map <- c("9a" = 28, "9a+" = 29, "9b" = 30, "9b+" = 31, "9c" = 32)
+climbers$GradeNumeric <- grade_map[climbers$HardestGrade]
+
+chart3 <- ggplot(climbers, aes(x = GradeNumeric, y = Avg_IFSC_Rank, size = Medals, label = Climber)) +
+  geom_point(alpha = 0.7, color = "#e41a1c") +
+  geom_text(vjust = -1, size = 4) +
+  scale_x_continuous(breaks = 28:32, labels = names(grade_map)) +
+  scale_size_continuous(range = c(4, 12)) +
+  scale_y_reverse() +
+  labs(
+    title = "Elite Climbers: Outdoor Difficulty vs. IFSC Ranking",
+    x = "Hardest Outdoor Grade",
+    y = "Average IFSC Ranking (Lower is Better)",
+    size = "IFSC Medals"
+  ) +
+  theme_minimal()
+
+ggsave("images/chart3.png", chart3, width = 8, height = 5)
+```
+
+## Chart 3: How Ondra Stacks Up Against Other Elite Climbers
+
+![Elite Comparison](images/chart3.png)
+
+This chart puts Adam Ondra’s legacy into perspective...
+
