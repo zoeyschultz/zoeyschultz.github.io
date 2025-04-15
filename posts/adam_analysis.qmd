@@ -29,33 +29,6 @@ In this post, I use data from his IFSC results and outdoor ascents to explore hi
 
 ------------------------------------------------------------------------
 
-```{r chart1, include=FALSE, message=FALSE, warning=FALSE}
-
-rankings <- read_csv("adam-ondra-best-climber/data/adam_master_rankings.csv", show_col_types = FALSE)
-
-filtered <- rankings |>
-  filter(Discipline %in% c("lead", "boulder"),
-         Date >= 2010, Date <= 2024)
-
-avg_rankings <- filtered |>
-  group_by(Date, Discipline) |>
-  summarise(AverageRank = mean(Rank, na.rm = TRUE), .groups = "drop")
-
-chart1 <- ggplot(avg_rankings, aes(x = Date, y = AverageRank, color = Discipline)) +
-  geom_line(linewidth = 1.2) +
-  geom_point(linewidth = 3) +
-  scale_y_reverse() +
-  labs(
-    title = "Adam Ondra's Average IFSC Rankings (2010–2024)",
-    x = "Year",
-    y = "Average IFSC Rank (Lower is Better)",
-    color = "Discipline"
-  ) +
-  theme_minimal()
-
-ggsave("images/chart1.png", chart1, width = 8, height = 5)
-```
-
 ## Chart 1: IFSC Rankings Over Time
 
 ![Adam Ondra IFSC Rankings](images/chart1.png)
