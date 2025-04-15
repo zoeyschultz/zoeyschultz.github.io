@@ -18,14 +18,14 @@
     "href": "posts/adam-ondra-analysis.html",
     "title": "How Good Is Adam Ondra, Really?",
     "section": "",
-    "text": "Adam Ondra is widely considered the best climber in the world — but how does his performance actually compare in competitions and on real rock?\nIn this post, I use data from his IFSC results and outdoor ascents to explore his strengths, tradeoffs, and one surprising weakness that cost him at the Olympics.\nTEST PLEASE"
+    "text": "Code\nknitr::opts_chunk$set(\n  echo = FALSE,\n  message = FALSE,\n  warning = FALSE,\n  results = 'hide'\n)\n\nsuppressPackageStartupMessages({\n  library(ggplot2)\n  library(dplyr)\n  library(readr)\n  library(tidyr)\n  library(lubridate)\n  library(tibble)\n})"
   },
   {
     "objectID": "posts/adam-ondra-analysis.html#introduction",
     "href": "posts/adam-ondra-analysis.html#introduction",
     "title": "How Good Is Adam Ondra, Really?",
-    "section": "",
-    "text": "Adam Ondra is widely considered the best climber in the world — but how does his performance actually compare in competitions and on real rock?\nIn this post, I use data from his IFSC results and outdoor ascents to explore his strengths, tradeoffs, and one surprising weakness that cost him at the Olympics.\nTEST PLEASE"
+    "section": "Introduction",
+    "text": "Introduction\nAdam Ondra is widely considered the best climber in the world — but how does his performance actually compare in competitions and on real rock?\nIn this post, I use data from his IFSC results and outdoor ascents to explore his strengths, tradeoffs, and one surprising weakness that cost him at the Olympics."
   },
   {
     "objectID": "posts/adam-ondra-analysis.html#chart-1-ifsc-rankings-over-time",
