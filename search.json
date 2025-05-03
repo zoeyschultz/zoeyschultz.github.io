@@ -21,10 +21,45 @@
     "text": "One Format, Three Disciplines — and It Cost Ondra a Medal\nOndra, known primarily for his achievements in lead climbing and outdoor ascents, competed in the Tokyo 2020 Olympics under the combined format, which included speed climbing, bouldering, and lead. Final rankings were determined by multiplying each athlete’s placements across the three disciplines, meaning a lower placement in any one event could significantly affect the overall score.\nOndra placed 4th in speed, which was considered a strong result given that it is typically his weakest discipline. However, a 6th-place finish in bouldering, combined with 2nd in lead, resulted in a combined score that placed him 6th overall. While he performed well in both speed and lead, the bouldering round proved to be a limiting factor in his final ranking under the event’s scoring format.\nThis chart underscores the frustration many climbers felt with the 2020 format — a format that was split into separate events at Paris 2024."
   },
   {
+    "objectID": "posts/speed-climbing-ages.html",
+    "href": "posts/speed-climbing-ages.html",
+    "title": "Do Speed Climbers Peak Younger?",
+    "section": "",
+    "text": "Code\nknitr::opts_chunk$set(\n  echo = TRUE,\n  message = FALSE,\n  warning = FALSE,\n  results = 'hide'\n)\n\nsuppressPackageStartupMessages({\n  library(ggplot2)\n  library(dplyr)\n  library(readr)\n  library(tidyr)\n  library(janitor)\n  library(scales)\n  library(waffle)\n  library(tibble)\n})\nAre speed climbers peaking younger than their bouldering or lead counterparts?\nI am exploring whether speed climbers peak younger than bouldering or lead climbers to understand how age influences success across climbing disciplines. The physical and mental demands of each style may shape when athletes reach their prime, and that has big implications for training, team selection, and the future of the sport."
+  },
+  {
+    "objectID": "posts/speed-climbing-ages.html#chart-1-age-vs.-placement-bubble-chart",
+    "href": "posts/speed-climbing-ages.html#chart-1-age-vs.-placement-bubble-chart",
+    "title": "Do Speed Climbers Peak Younger?",
+    "section": "Chart 1: Age vs. Placement (Bubble Chart)",
+    "text": "Chart 1: Age vs. Placement (Bubble Chart)\n\n\nCode\nifsc &lt;- read_csv(\"data/ifsc_finalists_full_with_ages.csv\", show_col_types = FALSE)\n\nbubble_data &lt;- ifsc |&gt;\n  count(discipline, age_at_competition, rank)\n\nchart1 &lt;- ggplot(bubble_data, aes(x = age_at_competition, y = rank, size = n, color = discipline)) +\n  geom_point(alpha = 0.7) +\n  scale_y_reverse() +\n  scale_size(range = c(3, 12)) +\n  labs(\n    title = \"Speed Climbers Peak Earlier\",\n    subtitle = \"Younger athletes are more common among top-ranked speed climbers.\",\n    x = \"Age at Competition\",\n    y = \"Final Rank (Lower is Better)\",\n    size = \"Frequency\",\n    color = \"Discipline\"\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(face = \"bold\", size = 16, margin = margin(b = 10)),\n    axis.title = element_text(face = \"bold\"),\n    axis.text = element_text(color = \"black\"),\n    panel.grid.minor = element_blank(),\n    panel.grid.major.x = element_blank()\n  )\n\nggsave(\"images/chart1.png\", chart1, width = 8, height = 5)\nchart1"
+  },
+  {
+    "objectID": "posts/speed-climbing-ages.html#chart-2-podium-age-range-dumbbell-chart",
+    "href": "posts/speed-climbing-ages.html#chart-2-podium-age-range-dumbbell-chart",
+    "title": "Do Speed Climbers Peak Younger?",
+    "section": "Chart 2: Podium Age Range (Dumbbell Chart)",
+    "text": "Chart 2: Podium Age Range (Dumbbell Chart)\n\n\nCode\npodium &lt;- ifsc |&gt;\n  filter(rank %in% 1:3) |&gt;\n  group_by(discipline) |&gt;\n  summarise(min_age = min(age_at_competition), max_age = max(age_at_competition), .groups = \"drop\")\n\nchart2 &lt;- ggplot(podium, aes(x = min_age, xend = max_age, y = discipline)) +\n  geom_segment(aes(xend = max_age, yend = discipline), color = \"#2b8cbe\", size = 2) +\n  geom_point(aes(x = min_age), color = \"black\", size = 4) +\n  geom_point(aes(x = max_age), color = \"black\", size = 4) +\n  labs(\n    title = \"Speed Podium Finishers Are Younger\",\n    subtitle = \"1st–3rd place finishers in speed are younger than in other disciplines.\",\n    x = \"Age at Competition\",\n    y = \"Discipline\"\n  ) +\n  theme_minimal(base_size = 13) +\n  theme(\n    plot.title = element_text(face = \"bold\", size = 16, margin = margin(b = 10)),\n    axis.title = element_text(face = \"bold\"),\n    axis.text = element_text(color = \"black\"),\n    panel.grid.minor = element_blank(),\n    panel.grid.major.x = element_blank()\n  )\n\nggsave(\"images/chart2.png\", chart2, width = 8, height = 5)\nchart2"
+  },
+  {
+    "objectID": "posts/speed-climbing-ages.html#chart-3-finalist-age-distribution-waffle-chart",
+    "href": "posts/speed-climbing-ages.html#chart-3-finalist-age-distribution-waffle-chart",
+    "title": "Do Speed Climbers Peak Younger?",
+    "section": "Chart 3: Finalist Age Distribution (Waffle Chart)",
+    "text": "Chart 3: Finalist Age Distribution (Waffle Chart)\n\n\nCode\nages &lt;- read_csv(\"data/ifsc_finalists_ages.csv\", show_col_types = FALSE)\n\nages_binned &lt;- ages |&gt;\n  mutate(age_group = case_when(\n    age &lt; 18 ~ \"&lt;18\",\n    age &lt; 21 ~ \"18–20\",\n    age &lt; 24 ~ \"21–23\",\n    age &lt; 27 ~ \"24–26\",\n    TRUE ~ \"27+\"\n  )) |&gt;\n  count(discipline, age_group) |&gt;\n  group_by(discipline) |&gt;\n  mutate(percent = round(n / sum(n) * 100)) |&gt;\n  ungroup()\n\nwaffle_data &lt;- ages_binned |&gt;\n  filter(discipline == \"Speed\") |&gt;\n  select(age_group, percent) |&gt;\n  deframe()\n\nwaffle(\n  waffle_data,\n  rows = 5,\n  size = 1,\n  colors = RColorBrewer::brewer.pal(5, \"Blues\"),\n  title = \"Speed Finalists Skew Younger\",\n  xlab = \"1 square = 1% of Speed Finalists\"\n)"
+  },
+  {
+    "objectID": "posts/speed-climbing-ages.html#conclusion",
+    "href": "posts/speed-climbing-ages.html#conclusion",
+    "title": "Do Speed Climbers Peak Younger?",
+    "section": "Conclusion",
+    "text": "Conclusion\nSpeed climbers do appear to peak younger than their bouldering and lead peers. Their dominance at younger ages aligns with the sport’s emphasis on explosive power and quick-twitch ability, traits that often peak earlier in an athlete’s life. In contrast, lead and bouldering seem to favor athletes who have more experience, route-reading skills, and tactical endurance.\nThese trends aren’t just interesting — they shape athlete development pipelines, team selection strategies, and the future of competitive climbing."
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "ZoeysBlog",
     "section": "",
-    "text": "Why the Olympic Format Failed the World’s Best Climber\n\n\n\n\n\n\nclimbing\n\n\nanalysis\n\n\nsports\n\n\n\n\n\n\n\n\n\nApr 14, 2025\n\n\nZoey Schultz\n\n\n\n\n\n\nNo matching items"
+    "text": "Do Speed Climbers Peak Younger?\n\n\n\n\n\n\nclimbing\n\n\nanalysis\n\n\nsports\n\n\n\n\n\n\n\n\n\nMay 3, 2025\n\n\nZoey Schultz\n\n\n\n\n\n\n\n\n\n\n\n\nWhy the Olympic Format Failed the World’s Best Climber\n\n\n\n\n\n\nclimbing\n\n\nanalysis\n\n\nsports\n\n\n\n\n\n\n\n\n\nMay 3, 2025\n\n\nZoey Schultz\n\n\n\n\n\n\nNo matching items"
   }
 ]
